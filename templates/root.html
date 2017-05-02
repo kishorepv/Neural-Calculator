@@ -1,0 +1,120 @@
+
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>-->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
+</style>
+
+
+</head>
+
+<body>
+	<div class="container">
+	</div>
+	<div class="container">
+	<div class="row">
+	<div class="col-sm-3"></div>
+	<div class="col-sm-2">
+	<h4> <strong> Neural Calculator </strong> </h4>
+	</div>
+	</div>
+	 <div class="row no-gutter">
+		<div class="col-sm-8">
+	    <canvas id="c" width="778" height="600" style="border:1px solid #000000"></canvas>
+		</div>
+		<div class="col-sm-4">
+		</div>
+	</div>
+	<div class="row no-gutter">
+	<div class="col-sm-8">
+	<button id="exp" class="btn btn-default btn-block">{{exp if exp else "Draw the number above"}}</button>
+	</div>
+	<div class="col-sm-4">
+	</div>
+	</div>
+	<div class="row no-gutter">
+	    <div class="col-sm-2">
+		<button class="btn  btn-default btn-block" id="add"> <strong>+</strong> </button>
+	    </div>
+	    <div class="col-sm-2">
+	<button id="sub"  class="btn btn-default btn-block"> <strong>-</strong> </button>
+	    </div>
+	    <div class="col-sm-2"> 
+		<button id="mul"  class="btn btn-default btn-block"> <strong>*</strong> </button>
+	    </div>
+	    <div class="col-sm-2">
+	<button id="div"  class="btn btn-default btn-block"> <strong>/</strong> </button>
+	    </div>
+		<div class="col-sm-8">
+		</div> 
+	   </div>
+	<div class="row no-gutter" style="margin-top:0px">
+	<div class="col-sm-1">
+	<button id="backspace"  class="btn btn-default btn-block"> Backspace </button>	
+	</div>
+	<div class="col-sm-1">
+	<button id="reset"  class="btn btn-default btn-block"> Reset </button>	
+	</div>
+	<div class="col-sm-2">
+	<button id="eq"  class="btn btn-success btn-block"> = </button>
+	</div>
+	<div class="col-sm-4">
+	<button id="res" class="btn btn-default btn-block">0.0</button>
+	</div>
+	<div class="col-sm-4">
+	</div>
+	</div>
+	</div>	
+</form>
+<script>
+(function() {
+ // var $ = function(id){return document.getElementById(id)};
+  var canvas = this.__canvas = new fabric.Canvas('c', {
+    isDrawingMode: true
+  });
+  fabric.Object.prototype.transparentCorners = false;
+canvas.freeDrawingBrush.width=15;
+  var rect=new fabric.Rect({ width: canvas.width, height: canvas.height, fill: "white" });
+  canvas.add(rect);
+
+function f (op){
+ var dat=canvas.toDataURL('image/jpeg', 1.0);
+	if (op=="backspace" || op=="reset"){ dat=null;}
+	jQuery.ajax({
+	url:"/operator",
+	type:"POST",
+	data:JSON.stringify({"image":dat, "operator":op}),
+	contentType: "application/json;charset=UTF-8",
+	success: function(data){document.getElementById("exp").innerHTML=data.num; 
+	if (op=='=' || op=="reset") {document.getElementById("res").innerHTML=data.res;}
+}
+	});
+	if (op!='='){
+    		canvas.clear();
+    		var rect=new fabric.Rect({ width: canvas.width, height: canvas.height, fill: "white" });
+    		canvas.add(rect);
+	}
+}
+document.getElementById("add").addEventListener("click", function(){f('+');});
+document.getElementById("sub").addEventListener("click", function(){f('-');});
+document.getElementById("mul").addEventListener("click", function(){f('*');});
+document.getElementById("div").addEventListener("click", function(){f('/');});
+document.getElementById("eq").addEventListener("click", function(){f('=');});
+document.getElementById("backspace").addEventListener("click", function(){f("backspace");});
+document.getElementById("reset").addEventListener("click", function(){f("reset");});
+})();
+</script>
+
+</body>
+</html>
+
